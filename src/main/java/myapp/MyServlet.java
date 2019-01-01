@@ -11,9 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 @WebServlet(name = "foo", urlPatterns = "/")
 public class MyServlet extends HttpServlet {
@@ -32,10 +33,11 @@ public class MyServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        try (Connection cn = ds.getConnection()) {
-            PrintWriter writer = resp.getWriter();
-            writer.write("hello");
-            writer.write(cn.toString());
+        try (Connection cn = ds.getConnection();
+             Statement st = cn.createStatement();
+             ResultSet rs = st.executeQuery("SELECT 1")) {
+            rs.next();
+            resp.getWriter().println(rs.getInt(1));
         } catch (SQLException e1) {
             throw new ServletException(e1);
         }
