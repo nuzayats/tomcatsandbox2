@@ -79,6 +79,7 @@
                             <configfile>
                                 <file>src/test/tomcat/context.xml</file>
                                 <todir>conf/Catalina/localhost/</todir>
+                                <tofile>tomcatsandbox2.xml</tofile>
                             </configfile>
                         </configfiles>
                     </configuration>
