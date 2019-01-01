@@ -57,7 +57,6 @@
 
     <build>
         <plugins>
-            <!-- Start H2 before integration tests, accepting tcp connections on the randomly selected port -->
             <plugin>
                 <groupId>com.edugility</groupId>
                 <artifactId>h2-maven-plugin</artifactId>
@@ -67,14 +66,14 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>Spawn a new H2 TCP server</id>
+                        <id>start</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>spawn</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>Stop a spawned H2 TCP server</id>
+                        <id>stop</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
