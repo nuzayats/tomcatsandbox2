@@ -28,6 +28,6 @@ public class MyIT {
             actual = br.readLine();
         }
 
-        assertThat(actual, is("1 bar"));
+        assertThat(actual, is("Hello, someJndiValue: from_jndi, someTableValue: from_database"));
     }
 }

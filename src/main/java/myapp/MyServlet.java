@@ -3,31 +3,29 @@ package myapp;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 
 @WebServlet(name = "foo", urlPatterns = "/")
 public class MyServlet extends HttpServlet {
 
-    private DataSource ds;
-    private String foo;
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("myPU");
+    private String someJndiValue;
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
         try {
             Context initContext = new InitialContext();
-            ds = (DataSource) initContext.lookup("java:/comp/env/jdbc/myds");
-            foo = (String) initContext.lookup("java:/comp/env/foo");
+            someJndiValue = (String) initContext.lookup("java:/comp/env/someJndiValue");
         } catch (NamingException e) {
             throw new ServletException(e);
         }
@@ -35,13 +33,15 @@ public class MyServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        try (Connection cn = ds.getConnection();
-             Statement st = cn.createStatement();
-             ResultSet rs = st.executeQuery("SELECT 1")) {
-            rs.next();
-            resp.getWriter().println(rs.getInt(1) + " " + foo);
-        } catch (SQLException e1) {
-            throw new ServletException(e1);
+        EntityManager em = emf.createEntityManager();
+        String someTableValue;
+        try {
+            List<SomeTableEntity> list = em.createQuery("select e FROM SomeTableEntity e", SomeTableEntity.class).getResultList();
+            someTableValue = list.get(0).getSomeValue();
+        } finally {
+            em.close();
         }
+        resp.getWriter().write(String.format("Hello, someJndiValue: %s, someTableValue: %s",
+                someJndiValue, someTableValue));
     }
 }
