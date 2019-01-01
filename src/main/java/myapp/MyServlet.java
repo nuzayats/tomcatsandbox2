@@ -20,12 +20,14 @@ import java.sql.Statement;
 public class MyServlet extends HttpServlet {
 
     private DataSource ds;
+    private String foo;
 
     @Override
     public void init(final ServletConfig config) throws ServletException {
         try {
             Context initContext = new InitialContext();
             ds = (DataSource) initContext.lookup("java:/comp/env/jdbc/myds");
+            foo = (String) initContext.lookup("java:/comp/env/foo");
         } catch (NamingException e) {
             throw new ServletException(e);
         }
@@ -37,7 +39,7 @@ public class MyServlet extends HttpServlet {
              Statement st = cn.createStatement();
              ResultSet rs = st.executeQuery("SELECT 1")) {
             rs.next();
-            resp.getWriter().println(rs.getInt(1));
+            resp.getWriter().println(rs.getInt(1) + " " + foo);
         } catch (SQLException e1) {
             throw new ServletException(e1);
         }
